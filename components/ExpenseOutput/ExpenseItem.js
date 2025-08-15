@@ -1,13 +1,17 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import GlobalStyles from "../../constants/styles";
+import { useNavigation } from "@react-navigation/native";
 
 const ExpenseItem = ({data}) => {
+    const navigation = useNavigation();
   return (
     <View>
         {
             data && 
-            <Pressable>
+            <Pressable onPress={()=>{navigation.navigate("ManageExpense", {
+                expenseId: data.id
+            })}}>
                 <View style={styles.container}>
                     <View>
                         <Text style={[styles.textBase, styles.description]}>{data.description}</Text>

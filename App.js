@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
@@ -9,13 +9,17 @@ import AllExpense from "./screens/AllExpense";
 import GlobalStyles from "./constants/styles";
 import {Ionicons} from "@expo/vector-icons";
 import IconButton from './components/UI/IconButton';
+import { Provider } from 'react-redux';
+import store from './store/store';
 
 const Stack = createStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 
 const ExpensesOverview = () =>{
-  const addExpenseButtonHandler = () =>{
+  const navigation = useNavigation();
 
+  const addExpenseButtonHandler = () =>{
+    navigation.navigate("ManageExpense");
   }
 
   return (
@@ -42,16 +46,22 @@ const ExpensesOverview = () =>{
 
 export default function App() {
   return (
-    <>
+    <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen name='ExpensesOverview' component={ExpensesOverview} options={{
             headerShown: false,
           }}/>
-          <Stack.Screen name='ManageExpense' component={ManageExpense}/>
+          <Stack.Screen name='ManageExpense' component={ManageExpense} options={{
+            presentation: "modal",
+            headerStyle: {backgroundColor: GlobalStyles.colors.primary500},
+            headerTintColor: "#fff",
+            cardStyle: {backgroundColor: GlobalStyles.colors.primary700}
+
+          }}/>
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar style="light" />
-    </>
+    </Provider>
   );
 }

@@ -5,9 +5,7 @@ import ExpenseItem from "./ExpenseItem";
 const ExpenseList = ({expenses}) => {
   return (
     <View>
-        <FlatList data={expenses} renderItem={({item})=><ExpenseItem data={item}/>} keyExtractor={(item)=>{
-            return item && item.id
-        }}/>
+        <FlatList data={expenses} renderItem={({item})=><ExpenseItem data={item}/>} keyExtractor={(item, index)=>index.toString() }/>
     </View>
   );
 };
