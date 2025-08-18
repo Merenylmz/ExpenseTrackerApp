@@ -4,10 +4,13 @@ import IconButton from "../components/UI/IconButton";
 import GlobalStyles from "../constants/styles";
 import CustomButton from "../components/UI/CustomButton";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { addExpense, deleteExpense, editExpense } from "../store/slices/expenses";
 
 const ManageExpense = ({route, navigation}) => {
   const expenseId = route.params?.expenseId;
   const isEditing = !!expenseId;
+  const dispatch = useDispatch();
 
   useLayoutEffect(()=>{
     navigation.setOptions({
@@ -20,6 +23,11 @@ const ManageExpense = ({route, navigation}) => {
   }
 
   const editOrAddOperationButtonHandler = () =>{
+    if (isEditing) {
+      dispatch(editExpense({id: expenseId, description: "asdasdasdadasd", amount: 15, date: new Date().toISOString()}));
+    } else {
+      dispatch(addExpense({id: expenseId, description: "aaaaaaaaaaaaaaaaaaaaa", amount: 17, date: new Date().toISOString()}));
+    }
     navigation.goBack()
   }
 

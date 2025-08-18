@@ -5,17 +5,21 @@ import { useNavigation } from "@react-navigation/native";
 
 const ExpenseItem = ({data}) => {
     const navigation = useNavigation();
+    const date = data && new Date(data.date);
+    
+    
   return (
     <View>
         {
-            data && 
+            data && date &&
             <Pressable onPress={()=>{navigation.navigate("ManageExpense", {
                 expenseId: data.id
             })}}>
                 <View style={styles.container}>
                     <View>
                         <Text style={[styles.textBase, styles.description]}>{data.description}</Text>
-                        <Text style={styles.textBase}>{`${data.date.getFullYear()}-${data.date.getMonth()+1}-${data.date.getDate()}`}</Text>
+
+                        <Text style={styles.textBase}>{`${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`}</Text>
                     </View>
                     <View style={styles.amountContainer}>
                         <Text style={styles.amount}>{data.amount}</Text>
