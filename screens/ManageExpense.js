@@ -1,16 +1,22 @@
 import { StyleSheet, Text, View } from "react-native";
-import React, { useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import IconButton from "../components/UI/IconButton";
 import GlobalStyles from "../constants/styles";
-import CustomButton from "../components/UI/CustomButton";
-import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addExpense, deleteExpense, editExpense } from "../store/slices/expenses";
+import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 
 const ManageExpense = ({route, navigation}) => {
   const expenseId = route.params?.expenseId;
   const isEditing = !!expenseId;
   const dispatch = useDispatch();
+  const expenses = useSelector((state)=>state.expenses.expense);
+  const selectedExpense = expenses.find(item=>{
+    if (!item) return false; 
+    return item.id == expenseId
+  });
+  
+  
 
   useLayoutEffect(()=>{
     navigation.setOptions({
@@ -19,23 +25,25 @@ const ManageExpense = ({route, navigation}) => {
   }, [navigation, isEditing]);
 
   const deleteButtonHandler = () =>{
+    dispatch(deleteExpense(expenseId));
     navigation.goBack()
   }
 
-  const editOrAddOperationButtonHandler = () =>{
+  const editOrAddOperationButtonHandler = (inputs) =>{
     if (isEditing) {
-      dispatch(editExpense({id: expenseId, description: "asdasdasdadasd", amount: 15, date: new Date().toISOString()}));
+      dispatch(editExpense({id: expenseId, ...inputs})); 
     } else {
-      dispatch(addExpense({id: expenseId, description: "aaaaaaaaaaaaaaaaaaaaa", amount: 17, date: new Date().toISOString()}));
+      dispatch(addExpense({...inputs, date: inputs.date.toISOString(), id: expenseId}));
     }
     navigation.goBack()
   }
 
+
   return (
     <View>
-      <View style={styles.buttonsContainer}>
-        <CustomButton onPress={()=>navigation.goBack()} mode={"flat"}>Cancel</CustomButton>
-        <CustomButton onPress={editOrAddOperationButtonHandler}>{isEditing ? "Edit" : "Add"}</CustomButton>
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Your Expense</Text>
+        <ExpenseForm isEditing={isEditing} onCancel={()=>navigation.goBack()} onSubmit={editOrAddOperationButtonHandler} defaultValues={selectedExpense}/>
       </View>
       {
         isEditing && <View style={styles.deleteContainer}>
@@ -49,11 +57,13 @@ const ManageExpense = ({route, navigation}) => {
 export default ManageExpense;
 
 const styles = StyleSheet.create({
-  buttonsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+  title: {
+    color: "#fff",
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
     marginVertical: 20
+
   },
   deleteContainer: {
     justifyContent: "center",
@@ -62,5 +72,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     marginVertical: 15,
     marginHorizontal: 25
+  },
+  formContainer: {
+    padding: 15
   }
 });

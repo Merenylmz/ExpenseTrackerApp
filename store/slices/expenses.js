@@ -12,7 +12,7 @@ const expenseSlices = createSlice({
                 id: new Date().toString() + Math.random().toString(),
                 description: action.payload.description,
                 amount: action.payload.amount,
-                date: new Date().toISOString()
+                date: action.payload.date
             });
         },
         deleteExpense: (state, action)=>{
