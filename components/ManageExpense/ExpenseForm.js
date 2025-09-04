@@ -15,8 +15,10 @@ const ExpenseForm = ({isEditing, onSubmit, onCancel, defaultValues}) => {
       description: inputs.description
     };
     const amountIsValid = expenseData.amount > 0 && !isNaN(expenseData.amount)
-    const dateIsValid = new Date(expenseData.date) === "Invalid Date";
+    
+    const dateIsValid = new Date(expenseData.date) !== "Invalid Date";
     const descriptionIsValid = expenseData.description.trim().length > 0
+    
     if (!amountIsValid || !dateIsValid || !descriptionIsValid) {
       return Alert.alert("Invalid Input", "Please Check your input values");
     }

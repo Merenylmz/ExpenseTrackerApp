@@ -1,13 +1,16 @@
 import { StyleSheet, Text, View } from "react-native";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import IconButton from "../components/UI/IconButton";
 import GlobalStyles from "../constants/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { addExpense, deleteExpense, editExpense } from "../store/slices/expenses";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
+import { storeExpense , deleteExpenses, editExpenses} from "../utils/httpFirebase";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
 
 const ManageExpense = ({route, navigation}) => {
   const expenseId = route.params?.expenseId;
+  const [loading, setLoading] = useState(false);
   const isEditing = !!expenseId;
   const dispatch = useDispatch();
   const expenses = useSelector((state)=>state.expenses.expense);
@@ -24,22 +27,30 @@ const ManageExpense = ({route, navigation}) => {
     });
   }, [navigation, isEditing]);
 
-  const deleteButtonHandler = () =>{
+  const deleteButtonHandler = async() =>{
+    setLoading(true);
     dispatch(deleteExpense(expenseId));
+    const status = await deleteExpenses(expenseId);
+    setLoading(false);
     navigation.goBack()
   }
 
-  const editOrAddOperationButtonHandler = (inputs) =>{
+  const editOrAddOperationButtonHandler = async(inputs) =>{
+    setLoading(true);
     if (isEditing) {
-      dispatch(editExpense({id: expenseId, ...inputs})); 
+      dispatch(editExpense({id: expenseId, ...inputs}));
+      await editExpenses(expenseId, inputs); 
     } else {
-      dispatch(addExpense({...inputs, date: inputs.date.toISOString(), id: expenseId}));
+      const {name} = await storeExpense({...inputs, date: inputs.date.toISOString()});  
+      dispatch(addExpense({...inputs, date: inputs.date.toISOString(), id: name}));
     }
+    setLoading(false);
     navigation.goBack()
   }
 
 
   return (
+    !loading ? 
     <View>
       <View style={styles.formContainer}>
         <Text style={styles.title}>Your Expense</Text>
@@ -50,7 +61,7 @@ const ManageExpense = ({route, navigation}) => {
           <IconButton name={"trash"} color={GlobalStyles.colors.error500} size={36} onPress={deleteButtonHandler}/>
         </View>
       }
-    </View>
+    </View> : <LoadingOverlay />
   );
 };
 
